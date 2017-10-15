@@ -37,6 +37,19 @@ namespace Project2015To2017
 
             definition.ConditionalPropertyGroups = propertyGroups.Where(x => x.Attribute("Condition") != null).ToArray();
 
+			var removeNodes = new [] { "WarningLevel", "ErrorReport", "OutputPath" };
+			foreach (var conditionalPropertyGroup in definition.ConditionalPropertyGroups)
+			{
+				foreach (var removeNode in removeNodes)
+				{
+					conditionalPropertyGroup
+						.Elements()
+						.Where(n => n.Name.LocalName == removeNode)
+						.FirstOrDefault()
+						.Remove();
+				}
+			}
+
             if (definition.Type == ApplicationType.Unknown)
             {
                 throw new NotSupportedException("Unable to parse output type.");

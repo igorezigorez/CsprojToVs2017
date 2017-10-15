@@ -37,12 +37,42 @@ namespace Project2015To2017
             var compileManualIncludes = FindNonWildcardMatchedFiles(projectFolder, itemGroups, "*.cs", nsSys + "Compile");
             var otherIncludes = itemsToProject.SelectMany(x => itemGroups.Elements(nsSys + x));
 
-            definition.ItemsToInclude = compileManualIncludes.Concat(otherIncludes).ToArray();
+			var nodes = compileManualIncludes.Concat(RenameNodes(otherIncludes, "Content", "None")).ToList();
+
+			definition.ItemsToInclude = TransformManualIncludes(nodes, "Include", "Upadte");
 
             return Task.CompletedTask;
         }
 
-        private static IReadOnlyList<XElement> FindNonWildcardMatchedFiles(
+		private static IEnumerable<XElement> RenameNodes(IEnumerable<XElement> compileManualIncludes, string from, string to)
+		{
+			var newNodes = compileManualIncludes
+				.Where(n => n.Name.LocalName == from)
+				.Select(n => {
+					var newNode = new XElement(to, n.Elements().ToArray());
+					newNode.Add(n.Attributes());
+					return newNode;
+				});
+
+			return compileManualIncludes.Where(n => n.Name.LocalName != from).Concat(newNodes);
+		}
+
+		private static IReadOnlyList<XElement> TransformManualIncludes(IEnumerable<XElement> compileManualIncludes, string from, string to)
+		{
+			foreach (var node in compileManualIncludes)
+			{
+				var oldAtt = node.Attributes().Where(p => p.Name == from).SingleOrDefault();
+				if (oldAtt != null)
+				{
+					XAttribute newAtt = new XAttribute(to, oldAtt.Value);
+					node.Add(newAtt);
+					oldAtt.Remove();
+				}
+			}
+			return compileManualIncludes.ToList();
+		}
+
+		private static List<XElement> FindNonWildcardMatchedFiles(
             DirectoryInfo projectFolder, 
             IEnumerable<XElement> itemGroups, 
             string wildcard, 

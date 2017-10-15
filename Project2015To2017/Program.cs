@@ -12,61 +12,68 @@ using System.Xml.Linq;
 
 namespace Project2015To2017
 {
-    class Program
-    {
-        private static readonly IReadOnlyList<ITransformation> _transformationsToApply = new ITransformation[]
-        {
-            new ProjectPropertiesTransformation(),
-            new ProjectReferenceTransformation(),
-            new PackageReferenceTransformation(),
-            new AssemblyReferenceTransformation(),
-            new FileTransformation(),
-            new AssemblyInfoTransformation(),
-            new NugetPackageTransformation()
-        };
+	class Program
+	{
+		private static readonly IReadOnlyList<ITransformation> _transformationsToApply = new ITransformation[]
+		{
+			new ProjectPropertiesTransformation(),
+			new ProjectReferenceTransformation(),
+			new PackageReferenceTransformation(),
+			new AssemblyReferenceTransformation(),
+			new FileTransformation(),
+			new AssemblyInfoTransformation(),
+			new NugetPackageTransformation()
+		};
 
-        static void Main(string[] args)
-        {
-            if (args.Length == 0)
-            {
-                Console.WriteLine($"Please specify a project file.");
-                return;
-            }
+		static void Main(string[] args)
+		{
+			if (args.Length == 0)
+			{
+				Console.WriteLine($"Please specify a project file.");
+				return;
+			}
 
-            if (!File.Exists(args[0]))
-            {
-                Console.WriteLine($"File {args[0]} could not be found.");
-                return;
-            }
-            
-            XDocument xmlDocument;
-            using (var stream = File.Open(args[0], FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                xmlDocument = XDocument.Load(stream);
-            }
+			foreach (var proj in args)
+			{
+				if (!File.Exists(proj))
+				{
+					Console.WriteLine($"File {proj} could not be found.");
+					return;
+				}
 
-            XNamespace nsSys = "http://schemas.microsoft.com/developer/msbuild/2003";
-            if (xmlDocument.Element(nsSys + "Project") == null)
-            {
-                Console.WriteLine($"This is not a VS2015 project file.");
-                return;
-            }
+				//var path = args.Length == 0 || !File.Exists(proj)
+				//	? @"d:\Development\GitHubRepo\to2017csproj\CsprojToVs2017\RegSys.Registries.ApplicationServices.csproj"
+				//	: proj;
 
-            var projectDefinition = new Project();
+				XDocument xmlDocument;
+				using (var stream = File.Open(proj, FileMode.Open, FileAccess.Read, FileShare.Read))
+				{
+					xmlDocument = XDocument.Load(stream);
+				}
 
-            var fileInfo = new FileInfo(args[0]);
-            var directory = fileInfo.Directory;
-            Task.WaitAll(_transformationsToApply.Select(t => t.TransformAsync(xmlDocument, directory, projectDefinition)).ToArray());
+				XNamespace nsSys = "http://schemas.microsoft.com/developer/msbuild/2003";
+				if (xmlDocument.Element(nsSys + "Project") == null)
+				{
+					Console.WriteLine($"This is not a VS2015 project file.");
+					return;
+				}
 
-            var backupFileName = fileInfo.FullName + ".old";
-            if (File.Exists(backupFileName))
-            {
-                Console.Write($"Transformation succeeded but cannot create backup file. Please delete {backupFileName}.");
-                return;
-            }
-            File.Copy(args[0], fileInfo.FullName + ".old");
+				var projectDefinition = new Project();
 
-            new ProjectWriter().Write(projectDefinition, fileInfo);
+				var fileInfo = new FileInfo(proj);
+				var directory = fileInfo.Directory;
+				Task.WaitAll(_transformationsToApply.Select(t => t.TransformAsync(xmlDocument, directory, projectDefinition)).ToArray());
+
+				var backupFileName = fileInfo.FullName + ".old";
+				if (File.Exists(backupFileName))
+				{
+					Console.Write($"Transformation succeeded but cannot create backup file. Please delete {backupFileName}.");
+					return;
+				}
+				File.Copy(proj, fileInfo.FullName + ".old");
+
+				new ProjectWriter().Write(projectDefinition, fileInfo);
+			}
         }
     }
 }

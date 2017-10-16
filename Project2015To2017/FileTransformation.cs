@@ -37,14 +37,14 @@ namespace Project2015To2017
             var compileManualIncludes = FindNonWildcardMatchedFiles(projectFolder, itemGroups, "*.cs", nsSys + "Compile");
             var otherIncludes = itemsToProject.SelectMany(x => itemGroups.Elements(nsSys + x));
 
-			var nodes = compileManualIncludes.Concat(RenameNodes(otherIncludes, "Content", "None")).ToList();
-
-			definition.ItemsToInclude = TransformManualIncludes(nodes, "Include", "Upadte");
+			definition.ItemsToInclude = 
+				RenameAttribute(compileManualIncludes, "Include", "Upadte")
+				.Concat(RenameNode(otherIncludes, "Content", "None")).ToList();
 
             return Task.CompletedTask;
         }
 
-		private static IEnumerable<XElement> RenameNodes(IEnumerable<XElement> compileManualIncludes, string from, string to)
+		private static IEnumerable<XElement> RenameNode(IEnumerable<XElement> compileManualIncludes, string from, string to)
 		{
 			var newNodes = compileManualIncludes
 				.Where(n => n.Name.LocalName == from)
@@ -57,7 +57,7 @@ namespace Project2015To2017
 			return compileManualIncludes.Where(n => n.Name.LocalName != from).Concat(newNodes);
 		}
 
-		private static IReadOnlyList<XElement> TransformManualIncludes(IEnumerable<XElement> compileManualIncludes, string from, string to)
+		private static IReadOnlyList<XElement> RenameAttribute(IEnumerable<XElement> compileManualIncludes, string from, string to)
 		{
 			foreach (var node in compileManualIncludes)
 			{

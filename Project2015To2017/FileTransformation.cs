@@ -37,8 +37,8 @@ namespace Project2015To2017
             var compileManualIncludes = FindNonWildcardMatchedFiles(projectFolder, itemGroups, "*.cs", nsSys + "Compile");
             var otherIncludes = itemsToProject.SelectMany(x => itemGroups.Elements(nsSys + x));
 
-			definition.ItemsToInclude = 
-				RenameAttribute(compileManualIncludes, "Include", "Upadte")
+			definition.ItemsToInclude =
+		        RenameNode(RenameAttribute(compileManualIncludes, "Include", "Update"), "Content", "None")
 				.Concat(RenameNode(otherIncludes, "Content", "None")).ToList();
 
             return Task.CompletedTask;

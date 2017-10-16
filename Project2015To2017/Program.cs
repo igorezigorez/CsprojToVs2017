@@ -30,8 +30,13 @@ namespace Project2015To2017
 			if (args.Length == 0)
 			{
 				Console.WriteLine($"Please specify a project file.");
+
+				//args = new[] { @"c:\a\b\c.csproj" };
 				return;
 			}
+
+			var projWriter = new ProjectWriter();
+			var propCleaner = new PropertiesCleaner();
 
 			foreach (var proj in args)
 			{
@@ -41,9 +46,7 @@ namespace Project2015To2017
 					return;
 				}
 
-				//var path = args.Length == 0 || !File.Exists(proj)
-				//	? @"d:\Development\GitHubRepo\to2017csproj\CsprojToVs2017\RegSys.Registries.ApplicationServices.csproj"
-				//	: proj;
+				
 
 				XDocument xmlDocument;
 				using (var stream = File.Open(proj, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -72,7 +75,8 @@ namespace Project2015To2017
 				}
 				File.Copy(proj, fileInfo.FullName + ".old");
 
-				new ProjectWriter().Write(projectDefinition, fileInfo);
+				projWriter.Write(projectDefinition, fileInfo);
+				propCleaner.Clear(proj);
 			}
         }
     }

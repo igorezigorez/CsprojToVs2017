@@ -46,8 +46,6 @@ namespace Project2015To2017
 					return;
 				}
 
-				
-
 				XDocument xmlDocument;
 				using (var stream = File.Open(proj, FileMode.Open, FileAccess.Read, FileShare.Read))
 				{

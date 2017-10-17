@@ -37,40 +37,35 @@ namespace Project2015To2017
             var compileManualIncludes = FindNonWildcardMatchedFiles(projectFolder, itemGroups, "*.cs", nsSys + "Compile");
             var otherIncludes = itemsToProject.SelectMany(x => itemGroups.Elements(nsSys + x));
 
-			definition.ItemsToInclude =
-		        RenameNode(RenameAttribute(compileManualIncludes, "Include", "Update"), "Content", "None")
-				.Concat(RenameNode(otherIncludes, "Content", "None")).ToList();
+			var otherNodes = compileManualIncludes
+		        .Where(i => !i.Elements().Any(IsDependent))
+				.RenameAttribute("Include", "Update")
+				.ToList();
 
-            return Task.CompletedTask;
+	        var generatedNodes = compileManualIncludes
+		        .Where(i => i.Elements().SingleOrDefault(IsDependent) != null)
+				.Select(i => i.Elements().SingleOrDefault(IsDependent));
+
+	        if (generatedNodes?.Any() == true)
+				otherNodes.Add(XElementExtensions.CreateNode(
+					"Compile", 
+					new [] { new XAttribute("Update", "*.generated.cs") }, 
+					new [] { XElementExtensions.CreateNode("DependentUpon", value: ".tt") }));
+
+			definition.ItemsToInclude =
+				otherIncludes
+					.RenameAttribute("Include", "Update")
+					.RenameNode("Content", "None")
+				.Concat(otherNodes)
+				.ToList();
+
+			return Task.CompletedTask;
         }
 
-		private static IEnumerable<XElement> RenameNode(IEnumerable<XElement> compileManualIncludes, string from, string to)
-		{
-			var newNodes = compileManualIncludes
-				.Where(n => n.Name.LocalName == from)
-				.Select(n => {
-					var newNode = new XElement(to, n.Elements().ToArray());
-					newNode.Add(n.Attributes());
-					return newNode;
-				});
-
-			return compileManualIncludes.Where(n => n.Name.LocalName != from).Concat(newNodes);
-		}
-
-		private static IReadOnlyList<XElement> RenameAttribute(IEnumerable<XElement> compileManualIncludes, string from, string to)
-		{
-			foreach (var node in compileManualIncludes)
-			{
-				var oldAtt = node.Attributes().Where(p => p.Name == from).SingleOrDefault();
-				if (oldAtt != null)
-				{
-					XAttribute newAtt = new XAttribute(to, oldAtt.Value);
-					node.Add(newAtt);
-					oldAtt.Remove();
-				}
-			}
-			return compileManualIncludes.ToList();
-		}
+	    private bool IsDependent(XElement node)
+	    {
+		    return node.Name.LocalName == "DependentUpon" && node.Value.Trim().EndsWith(".tt");
+	    }
 
 		private static List<XElement> FindNonWildcardMatchedFiles(
             DirectoryInfo projectFolder, 

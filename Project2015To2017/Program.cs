@@ -31,8 +31,8 @@ namespace Project2015To2017
 			{
 				Console.WriteLine($"Please specify a project file.");
 
-				//args = new[] { @"c:\a\b\c.csproj" };
-				return;
+				args = new[] { @"c:\Workspace\RegSys.Registries.ApplicationServices.Contract.csproj" };
+				//return;
 			}
 
 			var projWriter = new ProjectWriter();

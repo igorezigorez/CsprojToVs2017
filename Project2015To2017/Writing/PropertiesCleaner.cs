@@ -9,15 +9,14 @@ namespace Project2015To2017.Writing
         {
 	        var directoryPath = projectpath.Remove(projectpath.LastIndexOf('\\')) + "\\Properties";
 
-			File.Delete(directoryPath + "\\AssemblyInfo.cs");
-
 	        try
 	        {
-		        Directory.Delete(directoryPath);
+				File.Delete(directoryPath + "\\AssemblyInfo.cs");
+				Directory.Delete(directoryPath);
 	        }
 	        catch (Exception e)
 	        {
-		        Console.WriteLine("error deleting directory");
+		        Console.WriteLine("error deleting Properties directory");
 	        }
         }
     }

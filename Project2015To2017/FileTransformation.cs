@@ -44,12 +44,12 @@ namespace Project2015To2017
 
 			var generatedNodes = compileManualIncludes
 				.Where(i => i.Elements().SingleOrDefault(IsDependent) != null)
-				.Select(i => i.Elements().SingleOrDefault(IsDependent))
-				.GroupBy(x => x.Value)
+				.GroupBy(i => i.Elements().SingleOrDefault(IsDependent).Value)
 				.Select(e => XElementExtensions.CreateNode(
 					"Compile",
-					new[] { new XAttribute("Update", "*.generated.cs") },
-					new[] { e.First() }))
+					new[] { new XAttribute("Update", CreateGeneratedAttrValue(e.Attributes())) },
+					//e.Attributes().SingleOrDefault(a=>a.Name.LocalName == "Include")?.Value + "*.generated.cs") },
+					new[] { e.Elements().FirstOrDefault(IsDependent) }))
 				.ToList();
 
 			definition.ItemsToInclude =
@@ -61,6 +61,12 @@ namespace Project2015To2017
 				.ToList();
 
 			return Task.CompletedTask;
+		}
+
+		private string CreateGeneratedAttrValue(IEnumerable<XAttribute> attributes)
+		{
+			var attrValue = attributes.FirstOrDefault(a => a.Name.LocalName == "Include")?.Value;
+			return attrValue.Remove(attrValue.LastIndexOf('\\') + 1) + "*.generated.cs";
 		}
 
 		private bool IsDependent(XElement node)

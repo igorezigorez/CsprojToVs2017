@@ -48,7 +48,6 @@ namespace Project2015To2017
 				.Select(e => XElementExtensions.CreateNode(
 					"Compile",
 					new[] { new XAttribute("Update", CreateGeneratedAttrValue(e.Attributes())) },
-					//e.Attributes().SingleOrDefault(a=>a.Name.LocalName == "Include")?.Value + "*.generated.cs") },
 					new[] { e.Elements().FirstOrDefault(IsDependent) }))
 				.ToList();
 

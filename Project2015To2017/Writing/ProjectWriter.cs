@@ -168,20 +168,20 @@ namespace Project2015To2017.Writing
 
         private void AddAssemblyAttributeNodes(XElement mainPropertyGroup, AssemblyAttributes assemblyAttributes)
         {
-            if (assemblyAttributes == null)
-            {
-                return;
-            }
+            //if (assemblyAttributes == null)
+            //{
+            //    return;
+            //}
 
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyTitleAttribute", "false");
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyCompanyAttribute", "false");
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyDescriptionAttribute", "false");
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyProductAttribute", "false");
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyCopyrightAttribute", "false");
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyInformationalVersionAttribute", "false");
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyVersionAttribute", "false");
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyFileVersionAttribute", "false");
-            AddIfNotNull(mainPropertyGroup, "GenerateAssemblyConfigurationAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyTitleAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyCompanyAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyDescriptionAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyProductAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyCopyrightAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyInformationalVersionAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyVersionAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyFileVersionAttribute", "false");
+            //AddIfNotNull(mainPropertyGroup, "GenerateAssemblyConfigurationAttribute", "false");
         }
 
         private void AddIfNotNull(XElement node, string elementName, string value)
